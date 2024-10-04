@@ -1,0 +1,8 @@
+{
+  "name": "og-cli",
+  "version": "1.0.0",
+  "bin": {
+    "og": "./bin/og.js"
+  },
+  "dependencies": {}
+}
