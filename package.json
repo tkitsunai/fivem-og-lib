@@ -4,19 +4,24 @@
   "scripts": {
     "og-misc": "pnpm -F \"og-misc-*\"",
     "build:all": "pnpm -r build",
-    "test:all": "pnpm -r test"
+    "test:all": "pnpm -r test",
+    "cli-install": "cd og-cli & npm link -y"
   },
   "keywords": [],
-  "author": "",
+  "private": true,
+  "author": "tkits",
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "@citizenfx/client": "2.0.10191-1",
-    "@citizenfx/server": "2.0.10191-1",
-    "typescript": "^5.6.2"
+    "@citizenfx/client": "2.0.10272-1",
+    "@citizenfx/server": "2.0.10272-1",
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
     "vite": "^5.4.8",
     "vitest": "^2.1.2"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

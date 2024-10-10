@@ -1,17 +1,12 @@
 {
-  "name": "og-misc-ui",
+  "name": "og-helloworld-ui",
   "version": "1.0.0",
-  "description": "",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "test": "vitest run",
-    "test:watch": "vitest --watch"
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

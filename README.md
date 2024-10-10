@@ -54,7 +54,6 @@ This will compile and bundle your mod for use in the FiveM server.
 Each mod is built following a modular structure to ensure maintainability and scalability. A typical mod project will include:
 
 - `src/` - client/server code for your mod, written in TypeScript.
-- `public/` - Static assets like images, icons, and other files that will be served.
 - `dist/` - The output folder where your production-ready mod will be compiled.
 
 ## Contributing

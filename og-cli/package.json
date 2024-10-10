@@ -1,8 +1,12 @@
 {
   "name": "og-cli",
   "version": "1.0.0",
+  "type": "module",
   "bin": {
     "og": "./bin/og.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "commander": "^12.1.0",
+    "inquirer": "^12.0.0"
+  }
 }
