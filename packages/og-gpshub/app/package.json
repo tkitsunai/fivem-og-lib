@@ -7,7 +7,8 @@
     "build:s": "vite build --config vite.server.config.ts",
     "build": "pnpm run build:c & pnpm run build:s",
     "test": "vitest run",
-    "test:auto": "vitest"
+    "test:auto": "vitest",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "og-core": "workspace:*"

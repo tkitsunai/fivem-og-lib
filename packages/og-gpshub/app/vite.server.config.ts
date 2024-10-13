@@ -8,6 +8,7 @@ export default defineConfig({
     },
   },
   build: {
+    minify: false,
     rollupOptions: {
       input: {
         server: path.resolve(__dirname, "src/server/server.ts"),
@@ -15,6 +16,7 @@ export default defineConfig({
       output: {
         dir: "../dist/app",
         entryFileNames: "[name]/[name].js",
+        name: "gpshub_server",
         format: "es",
       },
     },

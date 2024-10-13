@@ -1,6 +1,6 @@
-import { NetworkPort } from "../port/networkPort";
+import { ClientNetworkPort } from "../port/networkPort";
 
-export class FiveMNetworkDriver implements NetworkPort {
+export class FiveMClientNetworkDriver implements ClientNetworkPort {
   on(event: string, handler: (...args: any[]) => void): void {
     onNet(event, handler);
   }

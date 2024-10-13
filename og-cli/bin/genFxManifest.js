@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRootDir = join(__dirname, "..", "..");
 
-function createContent(projectName, author, fileList) {
+function createContent({ author, version, name }, fileList) {
   const clientFiles = fileList
     .filter((file) => file.type === "client")
     .map((file) => file.fileName);
@@ -21,8 +21,8 @@ fx_version 'cerulean'
 game 'gta5'
 
 author '${author}'
-description 'MOD: ${projectName}'
-version '1.0.0'
+description 'MOD: ${name}'
+version '${version}'
 
 client_scripts {
   ${clientFiles.map((file) => `'${file}'`).join("\n")}
@@ -83,11 +83,7 @@ export function generateFxManifest(projectName) {
 
   const fileList = getFileList(fileDirs);
 
-  fs.writeFileSync(
-    outputPath,
-    createContent(config.project.name, config.project.version, fileList),
-    "utf-8"
-  );
+  fs.writeFileSync(outputPath, createContent(config.project, fileList), "utf-8");
 
   console.log(`fxmanifest.lua has been builded at ${outputPath}`);
 }

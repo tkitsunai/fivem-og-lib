@@ -1,32 +1,28 @@
 import { InMemorySessionGateway } from "../lib/gateway/inMemorySessionGateway";
 import { SessionUseCase } from "../lib/usecase/sessionUseCase";
-import { FiveMNetworkDriver } from "og-core/src/driver/fivemNetworkDriver";
-import { ChannelId } from "../lib/domain/channel";
-import { PlayerId } from "../lib/domain/player";
-import { EventUseCase } from "../lib/usecase/eventUseCase";
+import { FiveMServerNetworkDriver } from "og-core/src/driver/fivemServerNetworkDriver";
+import { PlayerLocationEventData } from "../types/events";
+import { ServerEventUseCase } from "og-core/src/usecase/EventUseCase";
 
 // drivers
-const fivemNetworkDriver = new FiveMNetworkDriver();
+const fivemNetworkDriver = new FiveMServerNetworkDriver();
 
 // gateways
 const sessionGateway = new InMemorySessionGateway();
 
 // usecases
 const sessionUseCase = new SessionUseCase(sessionGateway);
-const eventUseCase = new EventUseCase(fivemNetworkDriver);
+const eventUseCase = new ServerEventUseCase("og-gpshub", fivemNetworkDriver);
 
-eventUseCase.on(
-  "og-gpshub:join",
-  async (
-    channelId: ChannelId,
-    playerId: PlayerId,
-    location: { x: number; y: number; z: number }
-  ) => {
-    console.log("og-gpshub:join event handler", channelId, playerId, location);
-    try {
-      await sessionUseCase.join(channelId as ChannelId, playerId as PlayerId, location);
-    } catch (error: any) {
-      console.error(`Error joining session: ${error.message}`);
-    }
+eventUseCase.on("playerLocationUpdate", ({ playerId, location }: PlayerLocationEventData) => {
+  if (!playerId || !location) {
+    console.error("Invalid playerId or location:", { playerId, location });
+    return;
   }
-);
+  const playerServerId = source;
+
+  eventUseCase.emit("broadcastPlayerLocation", playerServerId, playerServerId, {
+    playerId,
+    location,
+  });
+});

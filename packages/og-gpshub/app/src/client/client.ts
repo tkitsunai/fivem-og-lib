@@ -1,26 +1,30 @@
-import { FiveMNetworkDriver } from "og-core/src/driver/fivemNetworkDriver";
-import { InMemorySessionGateway } from "../lib/gateway/inMemorySessionGateway";
-import { SessionUseCase } from "../lib/usecase/sessionUseCase";
-import { ChannelId } from "../lib/domain/channel";
+import { FiveMClientNetworkDriver } from "og-core/src/driver/fivemClientNetworkDriver";
 import { Location } from "../lib/domain/location";
-import { EventUseCase } from "../lib/usecase/eventUseCase";
+import { ClientEventUseCase } from "og-core/src/usecase/EventUseCase";
+import { PlayerLocationData } from "src/types/event";
+import { QBCitizenDriver } from "../lib/driver/qbCitizenDriver";
+import { FindCitizenNameUseCase } from "../lib/usecase/findCitizenNameUseCase";
+import { QbCitizenGateway } from "../lib/gateway/qbCitizenGateway";
+import { CitizenName } from "src/lib/domain/citizen";
 
 // drivers
-const fivemNetworkDriver = new FiveMNetworkDriver();
+const fivemNetworkDriver = new FiveMClientNetworkDriver();
+const citizenDriver = new QBCitizenDriver();
 
 // gateways
-const sessionGateway = new InMemorySessionGateway();
+const qbCitizenGateway = new QbCitizenGateway(citizenDriver);
 
 // usecases
-const sessionUseCase = new SessionUseCase(sessionGateway);
-const eventUseCase = new EventUseCase(fivemNetworkDriver);
+const eventUseCase = new ClientEventUseCase("og-gpshub", fivemNetworkDriver);
+const findCitizenNameUseCase = new FindCitizenNameUseCase(qbCitizenGateway);
 
-function joinSession(channelId: string) {
+function sendPlayerLocation() {
   const playerId = GetPlayerServerId(PlayerId());
-  const coords = GetEntityCoords(PlayerPedId(), true);
-  const locate = toLocationDomain(coords);
-  console.log("joinSession", channelId, playerId, coords);
-  sessionUseCase.join(channelId as ChannelId, playerId.toString(), locate);
+  const coords = GetEntityCoords(PlayerPedId(), true) as [number, number, number];
+  eventUseCase.emit("playerLocationUpdate", {
+    playerId: playerId.toString(),
+    location: toLocationDomain(coords),
+  });
 }
 
 function toLocationDomain(number: number[]): Location {
@@ -31,11 +35,36 @@ function toLocationDomain(number: number[]): Location {
   };
 }
 
-setTick(() => {
-  joinSession("test");
-});
+setInterval(() => {
+  sendPlayerLocation();
+}, 3000);
 
-// 位置情報を受け取る
-eventUseCase.on("og-gpshub:receiveLocate", (locate: Location) => {
-  console.log("receiveLocate", locate);
-});
+type BlipNumber = number;
+type ServerPlayerId = number;
+
+const playerBlips: Map<ServerPlayerId, BlipNumber> = new Map();
+
+eventUseCase.on(
+  "broadcastPlayerLocation",
+  (serverPlayerId: ServerPlayerId, { playerId, location }: PlayerLocationData) => {
+    const citizenName: CitizenName = findCitizenNameUseCase.execute();
+
+    if (playerBlips.has(serverPlayerId)) {
+      const blip = playerBlips.get(serverPlayerId);
+      if (blip) {
+        SetBlipCoords(blip, location.x, location.y, location.z);
+      }
+    } else {
+      const blip = AddBlipForCoord(location.x, location.y, location.z);
+      SetBlipSprite(blip, 480);
+      SetBlipColour(blip, 2);
+      SetBlipScale(blip, 0.8);
+
+      BeginTextCommandSetBlipName("STRING");
+      AddTextComponentString([citizenName.firstName, citizenName.lastName].join(" "));
+      EndTextCommandSetBlipName(blip);
+
+      playerBlips.set(serverPlayerId, blip);
+    }
+  }
+);
