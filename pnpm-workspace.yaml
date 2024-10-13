@@ -1,2 +1,4 @@
 packages:
+  - "og-cli"
+  - "packages/og-core"
   - "packages/og-*/*"

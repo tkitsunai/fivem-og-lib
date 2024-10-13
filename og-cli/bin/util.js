@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 
 export function loadTemplate(templatePath) {
   return fs.readFileSync(templatePath, "utf8");
@@ -24,4 +25,14 @@ export function copyDir(src, dest) {
       console.log(`Copied ${srcPath} to ${destPath}`);
     }
   });
+}
+
+export function cleanDirectory(dirPath) {
+  try {
+    if (fs.existsSync(dirPath)) {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+    }
+  } catch (err) {
+    console.error(`Failed to remove directory: ${dirPath}`, err);
+  }
 }

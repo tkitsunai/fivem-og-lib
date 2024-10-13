@@ -2,6 +2,9 @@
 import { Command } from "commander";
 import { createProjectStructure } from "./project.js";
 import { packageProject } from "./package.js";
+import { deployProject } from "./deploy.js";
+import { generateFxManifest } from "./genFxManifest.js";
+import { clean } from "./clean.js";
 import inquirer from "inquirer";
 
 const program = new Command();
@@ -40,6 +43,22 @@ program
   .description("Package the project")
   .action((projectName) => {
     packageProject(projectName);
+    generateFxManifest(projectName);
+    console.log(`Project ${projectName} packaged successfully.`);
+  });
+
+program
+  .command("clean <projectName>")
+  .description("clean packaged project")
+  .action((projectName) => {
+    clean(projectName);
+  });
+
+program
+  .command("deploy <projectName>")
+  .description("deploy to the server resources")
+  .action((projectName) => {
+    deployProject(projectName);
   });
 
 program.parse(process.argv);

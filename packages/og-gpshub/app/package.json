@@ -1,0 +1,15 @@
+{
+  "name": "og-gpshub-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build:c": "vite build --config vite.client.config.ts",
+    "build:s": "vite build --config vite.server.config.ts",
+    "build": "pnpm run build:c & pnpm run build:s",
+    "test": "vitest run",
+    "test:auto": "vitest"
+  },
+  "dependencies": {
+    "og-core": "workspace:*"
+  }
+}

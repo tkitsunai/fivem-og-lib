@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "og-misc": "pnpm -F \"og-misc-*\"",
+    "gpshubapp": "pnpm -F \"og-gpshub-app\"",
+    "gpshubui": "pnpm -F \"og-gpshub-ui\"",
     "build:all": "pnpm -r build",
     "test:all": "pnpm -r test",
     "cli-install": "cd og-cli & npm link -y"

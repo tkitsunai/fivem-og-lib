@@ -47,9 +47,11 @@ function createDirectoryStructure(appDir, appName, withui) {
     console.log(`Created directory: ${dir}`);
   });
 
-  createFxManifest(appDir, withui);
+  createFile(path.join(appDir, "og.config.json"), createOgConfig(appName));
   createFile(path.join(appDir, "app", "package.json"), generateAppPackageJson(appName));
   createFile(path.join(appDir, "app", "tsconfig.json"), generateAppTsConfig());
+  createFile(path.join(appDir, "app", "vite.client.config.ts"), genViteClientConfig());
+  createFile(path.join(appDir, "app", "vite.server.config.ts"), genViteServerConfig());
   createFile(path.join(appDir, "app/src/server", "server.ts"), generateMinimalTs("server"));
   createFile(path.join(appDir, "app/src/client", "client.ts"), generateMinimalTs("client"));
 
@@ -62,11 +64,6 @@ function createDirectoryStructure(appDir, appName, withui) {
   }
 
   console.log("Project structure created successfully.");
-}
-
-function createFxManifest(appDir, withui) {
-  const fxmanifest = generateFxManifest(withui);
-  createFile(path.join(appDir, "fxmanifest.lua"), fxmanifest);
 }
 
 function createFile(filePath, content) {
@@ -84,14 +81,80 @@ function generateAppPackageJson(appName) {
     {
       name: `${appName}-app`,
       version: "1.0.0",
+      type: "module",
       scripts: {
-        build: "tsc -p tsconfig.json",
+        "build:c": "vite build --config vite.client.config.ts",
+        "build:s": "vite build --config vite.server.config.ts",
+        build: "pnpm run build:c & pnpm run build:s",
         test: "vitest run",
       },
     },
     null,
     2
   );
+}
+
+// app/vite.server.config.tsのテンプレート
+function genViteServerConfig() {
+  return `
+import { defineConfig } from "vite";
+import path from "path";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        server: path.resolve(__dirname, "src/server/server.ts"),
+      },
+      output: {
+        dir: "../dist/app",
+        entryFileNames: "[name]/[name].js",
+        format: "es",
+      },
+    },
+    target: "es2020",
+    outDir: "../dist/app",
+    emptyOutDir: false,
+  },
+});`;
+}
+// app/vite.client.config.tsのテンプレート
+function genViteClientConfig() {
+  return `
+import { defineConfig } from "vite";
+import path from "path";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    minify: false,
+    rollupOptions: {
+      input: {
+        client: path.resolve(__dirname, "src/client/client.ts"),
+      },
+      output: {
+        dir: "../dist/app",
+        entryFileNames: "client/client.js",
+        format: "iife",
+        name: "OG_project_client",
+        manualChunks: undefined,
+        inlineDynamicImports: false,
+      },
+    },
+    target: "es2020",
+    outDir: "../dist/app",
+    emptyOutDir: false,
+  },
+});`;
 }
 
 // app/tsconfig.jsonのテンプレートを生成
@@ -101,7 +164,7 @@ function generateAppTsConfig() {
       compilerOptions: {
         target: "ESNext",
         useDefineForClassFields: true,
-        module: "CommonJS",
+        module: "ESNext",
         moduleResolution: "Node",
         strict: true,
         esModuleInterop: true,
@@ -230,25 +293,13 @@ createRoot(document.getElementById("root")!).render(
 );`;
 }
 
-function generateFxManifest(withui) {
-  // __dirnameの代わり
-  const __filename = fileURLToPath(import.meta.url); // 現在のファイルパス
-  const __dirname = dirname(__filename); // 現在のディレクトリパス
+function createOgConfig(appName) {
+  const ogConfig = {
+    name: appName,
+    type: "client",
+    version: "1.0.0",
+    author: "your name",
+  };
 
-  const templatePath = path.join(__dirname, "templates", "fxmanifest.template.lua");
-  let template = loadTemplate(templatePath);
-
-  const filesSection = withui
-    ? `
-files {
-  'dist/ui/index.html',
-  'dist/ui/assets/index.js',
-}`
-    : "";
-
-  const uiPageSection = withui ? `ui_page 'dist/ui/index.html'` : "";
-
-  template = template.replace("{{files_section}}", filesSection).replace("{{ui_page_section}}", uiPageSection);
-
-  return template;
+  return JSON.stringify(ogConfig, null, 2);
 }
