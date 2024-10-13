@@ -2,3 +2,5 @@ dist
 node_modules
 
 tmp
+
+./og-cli/bin/deploy.json

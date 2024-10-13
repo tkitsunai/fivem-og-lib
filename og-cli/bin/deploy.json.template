@@ -1,0 +1,6 @@
+{
+  "deploy": {
+    "basePath": "FIXME - path to your server resource folder",
+    "modsFolder": "[my-og-mods]"
+  }
+}

@@ -49,11 +49,27 @@ When you're ready to deploy your mod, run:
 
 This will compile and bundle your mod for use in the FiveM server.
 
+### MOD Packaging
+
+By using the og-cli command run:
+
+`og package <project-name>`
+
+The built project is packaged into a format that can be distributed to the FiveM resources folder.
+
+It creates an `fxmanifest.lua` from the result of the built project, which is necessary to apply the developed mod to a FiveM server.
+
+If you create the project using the og-cli command `create <project-name>`, the `og.config.json` file is automatically generated. You can edit this configuration file to apply the necessary settings for generating the `fxmanifest.lua`.
+
 ## Mod Structure
 
 Each mod is built following a modular structure to ensure maintainability and scalability. A typical mod project will include:
 
-- `src/` - client/server code for your mod, written in TypeScript.
+- `app/` - client/server code for your mod, written in TypeScript.
+  - `client/` - Contains the code for client-side processing.
+  - `lib/` - Contains the core code of the mod. It follows the folder structure based on Clean Architecture / Onion Architecture, and includes the mod's business logic.
+  - `server/` - Contains the code for server-side processing.
+  - `og.config.json` - Configuration file used by og-cli for mod packaging.
 - `dist/` - The output folder where your production-ready mod will be compiled.
 
 ## Contributing
