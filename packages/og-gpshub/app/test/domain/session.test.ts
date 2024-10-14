@@ -1,24 +1,23 @@
 import { describe, expect, it } from "vitest";
 import { createLocation, createSession } from "../helpers/helper";
 import { PlayerId } from "../../src/lib/domain/player";
-import { Channel } from "../../src/lib/domain/channel";
+import { Channel, ChannelId } from "../../src/lib/domain/channel";
 import { Session, SessionId } from "../../src/lib/domain/session";
 
-describe("session domain test", () => {
-  it("should update player location", () => {
-    const target = createSession();
+describe("sessionTest", () => {
+  it("should join a session", () => {
+    const playerA = "A" as PlayerId;
+    const playerB = "B" as PlayerId;
+    const channel = { id: "channelId" as ChannelId };
 
-    const playerId = "player" as PlayerId;
-    const actual = target.updatePlayerLocation(playerId, createLocation());
+    const init = {
+      channel,
+      players: [playerA],
+    };
+    const target = new Session(init);
 
-    const expectValue = new Session({
-      sessionId: "session" as SessionId,
-      channel: { id: "channel" } as Channel,
-      playerLocations: {
-        values: new Map([[playerId, createLocation()]]),
-      },
-    });
+    const expectedValue = new Session({ channel, players: [playerA, playerB] });
 
-    expect(actual).toEqual(expectValue);
+    expect(target.join(playerB)).toEqual(expectedValue);
   });
 });

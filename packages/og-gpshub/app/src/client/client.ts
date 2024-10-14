@@ -6,6 +6,7 @@ import { QBCitizenDriver } from "../lib/driver/qbCitizenDriver";
 import { FindCitizenNameUseCase } from "../lib/usecase/findCitizenNameUseCase";
 import { QbCitizenGateway } from "../lib/gateway/qbCitizenGateway";
 import { CitizenName } from "src/lib/domain/citizen";
+import { EventName } from "og-core/src/port/networkPort";
 
 // drivers
 const fivemNetworkDriver = new FiveMClientNetworkDriver();
@@ -68,3 +69,47 @@ eventUseCase.on(
     }
   }
 );
+
+const EventMap = {
+  join: "playerJoinToSession",
+  create: "playerCreatedSession",
+  help: "og_gpshub:help",
+};
+
+type EventKey = keyof typeof EventMap;
+
+function emitCommand(source: number, args: string[], rawCommand: string) {
+  const commandNameArgs: EventKey = (args[0] || "help") as EventKey;
+
+  if (commandNameArgs === "help") {
+    emit("og_gpshub:help");
+    return;
+  }
+
+  console.log(`hello, ${source}`);
+  console.log(`commandName: ${commandNameArgs}`);
+  const commandName = EventMap[commandNameArgs];
+  console.log("eventName: ", commandName);
+
+  eventUseCase.emit(commandName, "チャンネルのIDをここに入れる");
+}
+
+RegisterCommand("ogAdmin", emitCommand, false);
+
+on("og_gpshub:help", () => {
+  const keys = Object.keys(EventMap) as EventKey[];
+
+  keys.forEach((key: EventKey) => {
+    TriggerEvent("chat:addMessage", {
+      color: [255, 0, 0],
+      multiline: true,
+      args: ["[OG-GPSHUB]", `/ogAdmin ${key}`],
+    });
+  });
+});
+
+TriggerEvent("chat:addSuggestion", "/ogAdmin", "ogAdminのAdminコマンド", [
+  { name: "help", help: "Shows available ogAdmin's sub commands" },
+  { name: "create", help: "create channel session" },
+  { name: "join", help: "join to channel session" },
+]);
