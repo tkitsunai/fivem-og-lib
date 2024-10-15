@@ -91,7 +91,7 @@ function emitCommand(source: number, args: string[], rawCommand: string) {
   const commandName = EventMap[commandNameArgs];
   console.log("eventName: ", commandName);
 
-  eventUseCase.emit(commandName, "チャンネルのIDをここに入れる");
+  eventUseCase.emit(commandName, args.slice(1));
 }
 
 RegisterCommand("ogAdmin", emitCommand, false);
@@ -108,8 +108,11 @@ on("og_gpshub:help", () => {
   });
 });
 
-TriggerEvent("chat:addSuggestion", "/ogAdmin", "ogAdminのAdminコマンド", [
-  { name: "help", help: "Shows available ogAdmin's sub commands" },
-  { name: "create", help: "create channel session" },
-  { name: "join", help: "join to channel session" },
+TriggerEvent("chat:addSuggestion", "/ogAdmin help", "ogAdminのAdmin Helpコマンド");
+
+TriggerEvent("chat:addSuggestion", "/ogAdmin join", "join channel session", [
+  { name: "channelName", help: "チャネル名を指定します" },
+]);
+TriggerEvent("chat:addSuggestion", "/ogAdmin create", "create channel session", [
+  { name: "channelName", help: "チャネル名を指定します" },
 ]);

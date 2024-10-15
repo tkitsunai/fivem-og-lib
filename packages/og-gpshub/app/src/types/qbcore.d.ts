@@ -3,6 +3,11 @@ declare module "qbcore" {
   interface QBCore {
     Functions: {
       GetPlayerData(): PlayerDatas;
+      Notify(
+        message: string,
+        type?: "success" | "info" | "error" | "police",
+        duration?: number
+      ): void;
     };
   }
 

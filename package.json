@@ -7,7 +7,8 @@
     "gpshubui": "pnpm -F \"og-gpshub-ui\"",
     "build:all": "pnpm -r build",
     "test:all": "pnpm -r test",
-    "cli-install": "cd og-cli & npm link -y"
+    "cli-install": "cd og-cli & npm link -y",
+    "gpshub:all": "pnpm gpshubapp build && og package og-gpshub && og deploy og-gpshub"
   },
   "keywords": [],
   "private": true,

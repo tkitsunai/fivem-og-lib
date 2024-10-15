@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "../dist/app",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "rootDir": "./",
     "types": ["@citizenfx/server", "@citizenfx/client", "node"]
   },

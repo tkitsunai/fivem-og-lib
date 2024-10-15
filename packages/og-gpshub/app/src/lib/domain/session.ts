@@ -17,4 +17,12 @@ export class Session {
       players: [...this.sessionInfo.players, playerId],
     });
   }
+
+  leave(leavePlayer: PlayerId): Session {
+    const result = this.sessionInfo.players.filter((player) => player !== leavePlayer);
+    return new Session({
+      ...this.sessionInfo,
+      players: result,
+    });
+  }
 }
