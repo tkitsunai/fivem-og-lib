@@ -8,19 +8,22 @@ import { Channel } from "src/lib/domain/channel";
 import { PlayerId } from "src/lib/domain/player";
 import { LeaveSessionUseCase } from "src/lib/usecase/leaveSessionUseCase";
 import { Events } from "src/constants/events";
-import { QBDriver } from "src/lib/driver/qbWrapperDriver";
+import { InMemorySessionDriver } from "src/lib/driver/inMemorySessionDriver";
+import { FindSessionUseCase } from "src/lib/usecase/findSessionUseCase";
 
 // drivers
 const fivemNetworkDriver = new FiveMServerNetworkDriver();
+const inMemorySessionDriver = new InMemorySessionDriver();
 
 // gateways
-const sessionGateway = new InMemorySessionGateway();
+const sessionGateway = new InMemorySessionGateway(inMemorySessionDriver);
 
 // usecases
 const eventUseCase = new ServerEventUseCase("og-gpshub", fivemNetworkDriver);
 const createSessionUseCase = new CreateSessionUseCase(sessionGateway);
 const joinSessionUseCase = new JoinSessionUseCase(sessionGateway);
 const leaveSessionUseCase = new LeaveSessionUseCase(sessionGateway);
+const findSessionUseCase = new FindSessionUseCase(sessionGateway);
 
 eventUseCase.on("playerLocationUpdate", ({ playerId, location }: PlayerLocationData) => {
   if (!playerId || !location) {
@@ -35,14 +38,19 @@ eventUseCase.on("playerLocationUpdate", ({ playerId, location }: PlayerLocationD
   });
 });
 
-eventUseCase.on(Events.create, (channelId: string) => {
+eventUseCase.on(Events.create, async (channelId: string) => {
   console.log("playerCreatedSession");
 
   const channel = {
     id: channelId,
   } as Channel;
 
-  createSessionUseCase.execute(channel, source as PlayerId);
+  const result = await createSessionUseCase.execute(channel, source as PlayerId);
+
+  console.log("create session: ", result.success);
+  if (!result.success) {
+    console.error(result.error);
+  }
 });
 
 eventUseCase.on(Events.join, async (channelid: string) => {
@@ -61,12 +69,28 @@ eventUseCase.on(Events.join, async (channelid: string) => {
   console.info("join to chennel session");
 });
 
-eventUseCase.on(Events.leave, (channelid: string) => {
+eventUseCase.on(Events.leave, async (channelid: string) => {
   console.log("playerLeaveSession");
 
   const channel = {
     id: channelid,
   } as Channel;
 
-  leaveSessionUseCase.execute(channel, source as PlayerId);
+  const result = await leaveSessionUseCase.execute(channel, source as PlayerId);
+
+  if (!result.success) {
+    console.error(result.error);
+  }
+});
+
+eventUseCase.on(Events.status, async () => {
+  const results = await findSessionUseCase.findAll();
+
+  if (results.length === 0) {
+    console.info("No session found");
+  }
+
+  results.forEach((session, idx) => {
+    console.info(`session ${idx}: `, session);
+  });
 });

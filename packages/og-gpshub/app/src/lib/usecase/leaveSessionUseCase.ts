@@ -2,17 +2,30 @@ import { Channel } from "../domain/channel";
 import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { SessionPort } from "../port/sessionPort";
+import { ChannelNotFoundError } from "./errors";
+import { Result } from "./result";
 
 export class LeaveSessionUseCase {
   constructor(private sessionPort: SessionPort) {}
 
-  async execute(channel: Channel, playerId: PlayerId): Promise<Session | null> {
+  async execute(
+    channel: Channel,
+    playerId: PlayerId
+  ): Promise<Result<Session, ChannelNotFoundError>> {
     const session = await this.sessionPort.findByChannelId(channel.id);
 
-    if (session) {
-      const updatedSession = session.leave(playerId);
-      return await this.sessionPort.save(updatedSession);
+    if (!session) {
+      return {
+        success: false,
+        error: new ChannelNotFoundError(channel.id),
+      };
     }
-    return null;
+
+    const leaved = session.leave(playerId);
+
+    return {
+      success: true,
+      value: await this.sessionPort.save(leaved),
+    };
   }
 }

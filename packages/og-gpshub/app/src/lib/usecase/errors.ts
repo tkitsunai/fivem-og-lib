@@ -4,3 +4,10 @@ export class ChannelNotFoundError extends Error {
     this.name = "ChannelNotFoundError";
   }
 }
+
+export class AlreadyExistsSession extends Error {
+  constructor(message: string = "already exists session") {
+    super(message);
+    this.name = "AlreadyExistsSession";
+  }
+}

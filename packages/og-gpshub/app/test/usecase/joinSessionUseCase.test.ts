@@ -4,6 +4,7 @@ import { Session } from "../../src/lib/domain/session";
 import { SessionPort } from "src/lib/port/sessionPort";
 import { JoinSessionUseCase } from "../../src/lib/usecase/joinSessionUseCase";
 import { describe, expect, it, vi } from "vitest";
+import { ChannelNotFoundError } from "@/src/lib/usecase/errors";
 
 describe("joinSessionUseCaseTest", () => {
   const channelId = "channelId" as ChannelId;
@@ -24,7 +25,7 @@ describe("joinSessionUseCaseTest", () => {
 
     const joinSpy = vi.spyOn(session, "join").mockReturnValue(expectedValue);
 
-    const portMock: Partial<SessionPort> = {
+    const portMock = {
       save: vi.fn().mockReturnValue(expectedValue),
       findByChannelId: vi.fn().mockReturnValue(session),
     };
@@ -39,5 +40,23 @@ describe("joinSessionUseCaseTest", () => {
     expect(portMock.save).toHaveBeenCalled();
     expect(actual.success).toBeTruthy();
     actual.success && expect(actual.value).toEqual(expectedValue);
+  });
+
+  it("if channel not found, should return error", async () => {
+    const portMock: Partial<SessionPort> = {
+      save: vi.fn(),
+      findByChannelId: vi.fn().mockReturnValue(null),
+    };
+
+    const actual = await new JoinSessionUseCase(portMock as SessionPort).execute(
+      channel,
+      playerId2
+    );
+
+    expect(actual.success).toBeFalsy();
+    !actual.success && expect(actual.error).toBeInstanceOf(ChannelNotFoundError);
+
+    expect(portMock.findByChannelId).toHaveBeenCalled();
+    expect(portMock.save).not.toHaveBeenCalled();
   });
 });

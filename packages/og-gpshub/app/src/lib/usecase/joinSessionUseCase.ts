@@ -2,8 +2,8 @@ import { Channel } from "../domain/channel";
 import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { SessionPort } from "../port/sessionPort";
-import { ChannelNotFoundError } from "./errors";
-import { Result } from "./result";
+import { ChannelNotFoundError } from "@/src/lib/usecase/errors";
+import { Result } from "src/lib/usecase/result";
 
 export class JoinSessionUseCase {
   constructor(private readonly sessionPort: SessionPort) {}

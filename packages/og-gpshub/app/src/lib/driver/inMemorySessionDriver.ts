@@ -1,25 +1,27 @@
-type SessionId = string & { __brand: "SessionId" };
-type ChannelId = string & { __brand: "ChannelId" };
+type PlayerId = number;
 
-type SessionEntity = {
-  id: SessionId;
-  channelId: ChannelId;
-  expiresAt: Date;
+export type SessionEntity = {
+  channelId: string;
+  players: PlayerId[];
 };
 
 export class InMemorySessionDriver {
-  private sessions: Map<SessionId, SessionEntity> = new Map();
+  private sessions: Map<string, SessionEntity> = new Map();
 
-  async save(sessionId: SessionId, session: SessionEntity): Promise<SessionEntity> {
-    this.sessions.set(sessionId, session);
-    return session;
+  async save(session: SessionEntity): Promise<void> {
+    console.log("SAVE SESSION: ", session);
+    this.sessions.set(this.savedKey(session.channelId), session);
   }
 
-  async find(sessionId: SessionId): Promise<SessionEntity | null> {
-    return this.sessions.get(sessionId) ?? null;
+  async findByChannelId(channelId: string): Promise<SessionEntity | null> {
+    return this.sessions.get(this.savedKey(channelId)) || null;
   }
 
-  async delete(sessionId: SessionId): Promise<void> {
-    this.sessions.delete(sessionId);
+  async findAll(): Promise<SessionEntity[]> {
+    return Array.from(this.sessions.values());
+  }
+
+  private savedKey(key: string): string {
+    return key.toLowerCase();
   }
 }

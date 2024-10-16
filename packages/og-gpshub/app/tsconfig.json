@@ -11,7 +11,10 @@
     "outDir": "../dist/app",
     "baseUrl": ".",
     "rootDir": "./",
-    "types": ["@citizenfx/server", "@citizenfx/client", "node"]
+    "types": ["@citizenfx/server", "@citizenfx/client", "node"],
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": ["src/**/*", "test"],
   "exclude": ["node_modules"]
