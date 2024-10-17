@@ -18,6 +18,7 @@
   "dependencies": {
     "@citizenfx/client": "2.0.10272-1",
     "@citizenfx/server": "2.0.10272-1",
+    "@types/node": "^22.7.6",
     "typescript": "^5.6.3"
   },
   "devDependencies": {
