@@ -21,6 +21,12 @@ export class InMemorySessionDriver {
     return Array.from(this.sessions.values());
   }
 
+  async deleteByChannelId(channelId: string): Promise<void> {
+    const actionResult = this.sessions.delete(this.savedKey(channelId));
+    console.log("DELETE SESSION: ", channelId, actionResult);
+    return;
+  }
+
   private savedKey(key: string): string {
     return key.toLowerCase();
   }

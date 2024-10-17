@@ -1,3 +1,4 @@
+import { AlreadyJoinedPlayerError } from "../usecase/errors";
 import { Channel } from "./channel";
 import { PlayerLocation, Location } from "./location";
 import { PlayerId } from "./player";
@@ -12,6 +13,10 @@ export class Session {
   constructor(readonly sessionInfo: SessionInfo) {}
 
   join(playerId: PlayerId): Session {
+    if (this.sessionInfo.players.includes(playerId)) {
+      throw new AlreadyJoinedPlayerError();
+    }
+
     return new Session({
       ...this.sessionInfo,
       players: [...this.sessionInfo.players, playerId],
@@ -24,5 +29,9 @@ export class Session {
       ...this.sessionInfo,
       players: result,
     });
+  }
+
+  hasPlayer(): boolean {
+    return this.sessionInfo.players.length > 0;
   }
 }

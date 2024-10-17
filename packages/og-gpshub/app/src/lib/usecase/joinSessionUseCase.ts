@@ -2,7 +2,7 @@ import { Channel } from "../domain/channel";
 import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { SessionPort } from "../port/sessionPort";
-import { ChannelNotFoundError } from "@/src/lib/usecase/errors";
+import { AlreadyJoinedPlayerError, ChannelNotFoundError } from "@/src/lib/usecase/errors";
 import { Result } from "src/lib/usecase/result";
 
 export class JoinSessionUseCase {
@@ -21,12 +21,18 @@ export class JoinSessionUseCase {
       };
     }
 
-    const joinedSession = session.join(playerId);
-    const saved = await this.sessionPort.save(joinedSession);
-
-    return {
-      success: true,
-      value: saved,
-    };
+    try {
+      const joinedSession = session.join(playerId);
+      const saved = await this.sessionPort.save(joinedSession);
+      return {
+        success: true,
+        value: saved,
+      };
+    } catch (e) {
+      return {
+        success: false,
+        error: e as AlreadyJoinedPlayerError,
+      };
+    }
   }
 }

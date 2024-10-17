@@ -8,7 +8,8 @@
     "build": "pnpm run build:c & pnpm run build:s",
     "test": "vitest run",
     "test:auto": "vitest",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "linter": "pnpx eslint ./src/**/*.{js,ts,tsx}"
   },
   "dependencies": {
     "og-core": "workspace:*"

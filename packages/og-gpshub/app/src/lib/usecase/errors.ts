@@ -11,3 +11,10 @@ export class AlreadyExistsSession extends Error {
     this.name = "AlreadyExistsSession";
   }
 }
+
+export class AlreadyJoinedPlayerError extends Error {
+  constructor(message: string = "already joined player") {
+    super(message);
+    this.name = "AlreadyJoinedPlayerError";
+  }
+}

@@ -25,7 +25,7 @@ describe("joinSessionUseCaseTest", () => {
 
     const joinSpy = vi.spyOn(session, "join").mockReturnValue(expectedValue);
 
-    const portMock = {
+    const portMock: Partial<SessionPort> = {
       save: vi.fn().mockReturnValue(expectedValue),
       findByChannelId: vi.fn().mockReturnValue(session),
     };
@@ -58,5 +58,26 @@ describe("joinSessionUseCaseTest", () => {
 
     expect(portMock.findByChannelId).toHaveBeenCalled();
     expect(portMock.save).not.toHaveBeenCalled();
+  });
+
+  it("if already same player in session, should return error", async () => {
+    const mockSession = new Session({
+      channel,
+      players: [playerId1],
+    });
+
+    const portMock: Partial<SessionPort> = {
+      save: vi.fn(),
+      findByChannelId: vi.fn().mockReturnValue(mockSession),
+    };
+
+    const actual = await new JoinSessionUseCase(portMock as SessionPort).execute(
+      channel,
+      playerId1
+    );
+
+    expect(portMock.findByChannelId).toHaveBeenCalled();
+    expect(portMock.save).not.toHaveBeenCalled();
+    expect(actual.success).toBeFalsy();
   });
 });

@@ -3,4 +3,6 @@ export const Events = {
   join: "playerJoinToSession",
   leave: "playerLeaveSession",
   status: "sessionStatus",
-};
+} as const;
+
+export type ServerEvents = typeof Events;

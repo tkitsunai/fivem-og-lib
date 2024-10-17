@@ -21,11 +21,19 @@ export class LeaveSessionUseCase {
       };
     }
 
-    const leaved = session.leave(playerId);
+    const leavedSession = session.leave(playerId);
+
+    if (!leavedSession.hasPlayer()) {
+      await this.sessionPort.deleteByChannelId(channel.id);
+      return {
+        success: true,
+        value: leavedSession,
+      };
+    }
 
     return {
       success: true,
-      value: await this.sessionPort.save(leaved),
+      value: await this.sessionPort.save(leavedSession),
     };
   }
 }

@@ -7,6 +7,7 @@ import { FindCitizenNameUseCase } from "../lib/usecase/findCitizenNameUseCase";
 import { QbCitizenGateway } from "../lib/gateway/qbCitizenGateway";
 import { CitizenName } from "src/lib/domain/citizen";
 import { Events } from "@/src/constants/events";
+import { RegisterCommands, SuggestionCommands } from "../constants/commands";
 
 // drivers
 const fivemNetworkDriver = new FiveMClientNetworkDriver();
@@ -76,12 +77,12 @@ const ClientEventMap = {
   leave: Events.leave,
   help: "og_gpshub:help",
   status: Events.status,
-};
+} as const;
 
-type EventKey = keyof typeof ClientEventMap;
+type ClientEventKey = keyof typeof ClientEventMap;
 
 function emitCommand(source: number, args: string[], rawCommand: string) {
-  const commandNameArgs: EventKey = (args[0] || "help") as EventKey;
+  const commandNameArgs: ClientEventKey = (args[0] || "help") as ClientEventKey;
 
   if (commandNameArgs === "help") {
     emit("og_gpshub:help");
@@ -96,12 +97,12 @@ function emitCommand(source: number, args: string[], rawCommand: string) {
   eventUseCase.emit(commandName, args.slice(1));
 }
 
-RegisterCommand("ogAdmin", emitCommand, false);
+RegisterCommand(RegisterCommands.ogAdmin, emitCommand, false);
 
 on("og_gpshub:help", () => {
-  const keys = Object.keys(ClientEventMap) as EventKey[];
+  const keys = Object.keys(ClientEventMap) as ClientEventKey[];
 
-  keys.forEach((key: EventKey) => {
+  keys.forEach((key: ClientEventKey) => {
     TriggerEvent("chat:addMessage", {
       color: [0, 0, 0],
       multiline: true,
@@ -110,14 +111,11 @@ on("og_gpshub:help", () => {
   });
 });
 
-TriggerEvent("chat:addSuggestion", "/ogAdmin help", "ogAdminのAdmin Helpコマンド");
-TriggerEvent("chat:addSuggestion", "/ogAdmin create", "create channel session", [
-  { name: "channelName", help: "チャネル名を指定します" },
-]);
-TriggerEvent("chat:addSuggestion", "/ogAdmin join", "join channel session", [
-  { name: "channelName", help: "チャネル名を指定します" },
-]);
-TriggerEvent("chat:addSuggestion", "/ogAdmin leave", "leave from channel session", [
-  { name: "channelName", help: "チャネル名を指定します" },
-]);
-TriggerEvent("chat:addSuggestion", "/ogAdmin status", "confirming server's all session", []);
+Object.values(SuggestionCommands).forEach((suggestion) => {
+  TriggerEvent(
+    "chat:addSuggestion",
+    suggestion.command,
+    suggestion.description,
+    suggestion.args || []
+  );
+});

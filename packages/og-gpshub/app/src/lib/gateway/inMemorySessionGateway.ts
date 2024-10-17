@@ -7,6 +7,10 @@ import { SessionPort } from "../port/sessionPort";
 export class InMemorySessionGateway implements SessionPort {
   constructor(private inMemorySessionDriver: InMemorySessionDriver) {}
 
+  async deleteByChannelId(channelId: ChannelId): Promise<void> {
+    return this.inMemorySessionDriver.deleteByChannelId(channelId.toString());
+  }
+
   async save(session: Session): Promise<Session> {
     const entity = {
       channelId: session.sessionInfo.channel.id.toString(),
@@ -23,7 +27,7 @@ export class InMemorySessionGateway implements SessionPort {
   }
 
   async findByChannelId(channelId: ChannelId): Promise<Session | null> {
-    const entity = await this.inMemorySessionDriver.findByChannelId(channelId);
+    const entity = await this.inMemorySessionDriver.findByChannelId(channelId.toString());
 
     return entity
       ? new Session({
