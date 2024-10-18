@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { FindCitizenNameUseCase } from "../../src/lib/usecase/findCitizenNameUseCase";
+import { FindCitizenUseCase } from "../../src/lib/usecase/findCitizenNameUseCase";
 import { CitizenPort } from "../../src/lib/port/citizenPort";
 
 describe("FindCitizenNameUseCase", () => {
@@ -13,7 +13,7 @@ describe("FindCitizenNameUseCase", () => {
       findCitizen: findCitizenMock,
     };
 
-    const actual = new FindCitizenNameUseCase(port as CitizenPort).execute();
+    const actual = new FindCitizenUseCase(port as CitizenPort).findCitizen();
 
     expect(actual).toEqual({
       firstName: "john",

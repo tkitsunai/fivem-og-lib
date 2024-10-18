@@ -1,5 +1,6 @@
-import { CitizenName } from "../domain/citizen";
+import { Citizen } from "../domain/citizen";
+import { PlayerId } from "../domain/player";
 
 export interface CitizenPort {
-  findCitizen(): CitizenName;
+  findCitizen(): Citizen;
 }

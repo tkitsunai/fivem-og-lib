@@ -1,4 +1,4 @@
-import QBCore from "qbcore";
+import ClientQBCore from "qbcore";
 
 export class QBDriver {
   private readonly qbCore: QBCore = exports["qb-core"].GetCoreObject();

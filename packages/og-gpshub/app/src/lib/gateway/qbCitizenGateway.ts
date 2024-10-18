@@ -1,15 +1,19 @@
-import { CitizenName } from "../domain/citizen";
-import { QBCitizenDriver } from "../driver/qbCitizenDriver";
+import { Citizen, CitizenId, CitizenName } from "../domain/citizen";
+import { PlayerId } from "../domain/player";
+import { ServerQBDriver } from "../driver/qbDriver";
 import { CitizenPort } from "../port/citizenPort";
 
 export class QbCitizenGateway implements CitizenPort {
-  constructor(private readonly qbCitizenDriver: QBCitizenDriver) {}
+  constructor(private readonly qbCitizenDriver: ServerQBDriver) {}
 
-  findCitizen(): CitizenName {
-    const playerData = this.qbCitizenDriver.getPlayerData();
+  findCitizen(): Citizen {
+    const { PlayerData } = this.qbCitizenDriver.getPlayerData();
     return {
-      firstName: playerData.charinfo.firstname,
-      lastName: playerData.charinfo.lastname,
-    } as CitizenName;
+      id: PlayerData.citizenid as CitizenId,
+      name: {
+        firstName: PlayerData.charinfo.firstname,
+        lastName: PlayerData.charinfo.lastname,
+      } as CitizenName,
+    } as Citizen;
   }
 }

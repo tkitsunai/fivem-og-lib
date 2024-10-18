@@ -11,7 +11,7 @@ export class ClientEventUseCase {
     this.networkPort.on(eventName, handler);
   }
 
-  emit(event: string, ...args: any[]): void {
+  emitToServer(event: string, ...args: any[]): void {
     const eventName = this.fullEventName(event);
     this.networkPort.emit(eventName, ...args);
   }
@@ -32,7 +32,7 @@ export class ServerEventUseCase {
     this.networkPort.on(eventName, handler);
   }
 
-  emit(event: string, targetId: number, ...args: any[]): void {
+  emitToClient(event: string, targetId: number, ...args: any[]): void {
     const eventName = this.fullEventName(event);
     this.networkPort.emit(eventName, targetId, ...args);
   }

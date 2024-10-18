@@ -1,6 +1,5 @@
 import { AlreadyJoinedPlayerError } from "../usecase/errors";
 import { Channel } from "./channel";
-import { PlayerLocation, Location } from "./location";
 import { PlayerId } from "./player";
 
 export type SessionId = string & { __brand: "SessionId" };

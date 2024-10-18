@@ -1,35 +1,26 @@
 import { FiveMClientNetworkDriver } from "og-core/src/driver/fivemClientNetworkDriver";
-import { Location } from "../lib/domain/location";
+import { PlayerLocation } from "../lib/domain/location";
 import { ClientEventUseCase } from "og-core/src/usecase/EventUseCase";
-import { PlayerLocationData } from "src/types/event";
-import { QBCitizenDriver } from "../lib/driver/qbCitizenDriver";
-import { FindCitizenNameUseCase } from "../lib/usecase/findCitizenNameUseCase";
-import { QbCitizenGateway } from "../lib/gateway/qbCitizenGateway";
-import { CitizenName } from "src/lib/domain/citizen";
 import { Events } from "@/src/constants/events";
 import { RegisterCommands, SuggestionCommands } from "../constants/commands";
+import { PlayerId as PlayerIdDomain } from "@/src/lib/domain/player";
 
 // drivers
 const fivemNetworkDriver = new FiveMClientNetworkDriver();
-const citizenDriver = new QBCitizenDriver();
-
-// gateways
-const qbCitizenGateway = new QbCitizenGateway(citizenDriver);
 
 // usecases
 const eventUseCase = new ClientEventUseCase("og-gpshub", fivemNetworkDriver);
-const findCitizenNameUseCase = new FindCitizenNameUseCase(qbCitizenGateway);
 
 function sendPlayerLocation() {
   const playerId = GetPlayerServerId(PlayerId());
   const coords = GetEntityCoords(PlayerPedId(), true) as [number, number, number];
-  eventUseCase.emit("playerLocationUpdate", {
+  eventUseCase.emitToServer("playerLocationUpdate", {
     playerId: playerId.toString(),
     location: toLocationDomain(coords),
   });
 }
 
-function toLocationDomain(number: number[]): Location {
+function toLocationDomain(number: number[]): PlayerLocation {
   return {
     x: Math.round(number[0]),
     y: Math.round(number[1]),
@@ -38,7 +29,7 @@ function toLocationDomain(number: number[]): Location {
 }
 
 setInterval(() => {
-  sendPlayerLocation();
+  //  sendPlayerLocation();
 }, 3000);
 
 type BlipNumber = number;
@@ -46,30 +37,32 @@ type ServerPlayerId = number;
 
 const playerBlips: Map<ServerPlayerId, BlipNumber> = new Map();
 
-eventUseCase.on(
-  "broadcastPlayerLocation",
-  (serverPlayerId: ServerPlayerId, { playerId, location }: PlayerLocationData) => {
-    const citizenName: CitizenName = findCitizenNameUseCase.execute();
+const localPlayerLocation: Map<PlayerIdDomain, Location> = new Map();
 
-    if (playerBlips.has(serverPlayerId)) {
-      const blip = playerBlips.get(serverPlayerId);
-      if (blip) {
-        SetBlipCoords(blip, location.x, location.y, location.z);
-      }
-    } else {
-      const blip = AddBlipForCoord(location.x, location.y, location.z);
-      SetBlipSprite(blip, 480);
-      SetBlipColour(blip, 2);
-      SetBlipScale(blip, 0.8);
+// eventUseCase.on(
+//   "broadcastPlayerLocation",
+//   (serverPlayerId: ServerPlayerId, { playerId, location }: PlayerLocationData) => {
+//     const citizenName: Citizen = findCitizenNameUseCase.findCitizen();
 
-      BeginTextCommandSetBlipName("STRING");
-      AddTextComponentString([citizenName.firstName, citizenName.lastName].join(" "));
-      EndTextCommandSetBlipName(blip);
+//     if (playerBlips.has(serverPlayerId)) {
+//       const blip = playerBlips.get(serverPlayerId);
+//       if (blip) {
+//         SetBlipCoords(blip, location.x, location.y, location.z);
+//       }
+//     } else {
+//       const blip = AddBlipForCoord(location.x, location.y, location.z);
+//       SetBlipSprite(blip, 480);
+//       SetBlipColour(blip, 2);
+//       SetBlipScale(blip, 0.8);
 
-      playerBlips.set(serverPlayerId, blip);
-    }
-  }
-);
+//       BeginTextCommandSetBlipName("STRING");
+//       AddTextComponentString([citizenName.firstName, citizenName.lastName].join(" "));
+//       EndTextCommandSetBlipName(blip);
+
+//       playerBlips.set(serverPlayerId, blip);
+//     }
+//   }
+// );
 
 const ClientEventMap = {
   join: Events.join,
@@ -77,24 +70,34 @@ const ClientEventMap = {
   leave: Events.leave,
   help: "og_gpshub:help",
   status: Events.status,
+  locate: "og_gpshub:locate",
 } as const;
 
 type ClientEventKey = keyof typeof ClientEventMap;
 
+function localEmitter(eventName: string, ...args: any[]) {
+  emit(eventName, ...args);
+}
+
 function emitCommand(source: number, args: string[], rawCommand: string) {
+  console.log(rawCommand);
   const commandNameArgs: ClientEventKey = (args[0] || "help") as ClientEventKey;
 
-  if (commandNameArgs === "help") {
-    emit("og_gpshub:help");
-    return;
+  switch (commandNameArgs) {
+    case "locate":
+      localEmitter("og_gpshub:locate");
+      return;
+    case "help":
+      localEmitter("og_gpshub:help");
+      return;
+    default:
+      break;
   }
 
-  console.log(`hello, ${source}`);
-  console.log(`commandName: ${commandNameArgs}`);
   const commandName = ClientEventMap[commandNameArgs];
-  console.log("eventName: ", commandName);
+  console.log("Server EventTrigger: ", commandName);
 
-  eventUseCase.emit(commandName, args.slice(1));
+  eventUseCase.emitToServer(commandName, args.slice(1));
 }
 
 RegisterCommand(RegisterCommands.ogAdmin, emitCommand, false);
@@ -108,6 +111,15 @@ on("og_gpshub:help", () => {
       multiline: true,
       args: ["[OG-GPSHUB]", `/ogAdmin ${key}`],
     });
+  });
+});
+
+on("og_gpshub:locate", () => {
+  const coords = GetEntityCoords(PlayerPedId(), true) as [number, number, number];
+  const playerLocation = toLocationDomain(coords);
+  console.log("find your location:", playerLocation);
+  eventUseCase.emitToServer(Events.recordLocation, {
+    location: playerLocation,
   });
 });
 

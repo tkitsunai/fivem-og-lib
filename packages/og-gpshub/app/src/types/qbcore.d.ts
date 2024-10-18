@@ -1,6 +1,6 @@
 // WIP
-declare module "qbcore" {
-  interface QBCore {
+declare module "client-qbcore" {
+  interface ClientQBCore {
     Functions: {
       GetPlayerData(): PlayerDatas;
       Notify(
@@ -12,13 +12,35 @@ declare module "qbcore" {
   }
 
   export interface PlayerDatas {
-    citizenid: string;
+    citizenid: number;
     charinfo: {
       firstname: string;
       lastname: string;
     };
   }
 
-  const QBCore: QBCore;
-  export = QBCore;
+  const ClientQBCore: ClientQBCore;
+  export = ClientQBCore;
+}
+
+declare module "server-qbcore" {
+  interface ServerQBCore {
+    Functions: {
+      GetPlayer(source: number): PlayerDatas;
+    };
+  }
+
+  export interface PlayerDatas {
+    Offline: boolean;
+    PlayerData: {
+      citizenid: string;
+      charinfo: {
+        firstname: string;
+        lastname: string;
+      };
+    };
+  }
+
+  const ServerQBCore: ServerQBCore;
+  export = ServerQBCore;
 }

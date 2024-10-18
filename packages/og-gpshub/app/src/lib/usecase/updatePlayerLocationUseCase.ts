@@ -1,19 +1,16 @@
-import { PlayerId } from "../domain/player";
+import { CitizenId } from "../domain/citizen";
+import { PlayerLocation } from "../domain/location";
+import { LocationPort } from "../port/locationPort";
 import { SessionPort } from "../port/sessionPort";
-import { Location } from "../domain/location";
 
 export class UpdatePlayerLocationUseCase {
-  constructor(private readonly sessionPort: SessionPort) {}
+  constructor(
+    private readonly locationPort: LocationPort,
+    private readonly sessionPort: SessionPort
+  ) {}
 
-  async execute(playerId: PlayerId, location: Location) {
-    const session = await this.sessionPort.findByPlayerId(playerId);
-
-    if (!session) {
-      throw new Error(`Session not found for player ${playerId}`);
-    }
-
-    const updatedSession = session.updatePlayerLocation(playerId, location);
-
-    this.sessionPort.save(updatedSession);
+  async execute(citizenId: CitizenId, location: PlayerLocation) {
+    this.locationPort.savePlayerLocation(citizenId, location);
+    // TODO セッションと連携し、チャネルと位置情報を関連付けする
   }
 }
