@@ -37,6 +37,11 @@ export class ServerEventUseCase {
     this.networkPort.emit(eventName, targetId, ...args);
   }
 
+  emit(event: string, ...args: any[]): void {
+    const eventName = this.fullEventName(event);
+    this.networkPort.emitLocal(eventName, ...args);
+  }
+
   private fullEventName(event: string): string {
     return [this.eventPrefix, event].join(":");
   }

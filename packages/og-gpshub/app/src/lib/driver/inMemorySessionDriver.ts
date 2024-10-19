@@ -9,7 +9,6 @@ export class InMemorySessionDriver {
   private sessions: Map<string, SessionEntity> = new Map();
 
   async save(session: SessionEntity): Promise<void> {
-    console.log("SAVE SESSION: ", session);
     this.sessions.set(this.savedKey(session.channelId), session);
   }
 
@@ -22,9 +21,7 @@ export class InMemorySessionDriver {
   }
 
   async deleteByChannelId(channelId: string): Promise<void> {
-    const actionResult = this.sessions.delete(this.savedKey(channelId));
-    console.log("DELETE SESSION: ", channelId, actionResult);
-    return;
+    this.sessions.delete(this.savedKey(channelId));
   }
 
   private savedKey(key: string): string {

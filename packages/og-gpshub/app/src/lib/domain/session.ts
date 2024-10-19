@@ -33,4 +33,8 @@ export class Session {
   hasPlayer(): boolean {
     return this.sessionInfo.players.length > 0;
   }
+
+  findAllPlayers(): PlayerId[] {
+    return this.sessionInfo.players;
+  }
 }

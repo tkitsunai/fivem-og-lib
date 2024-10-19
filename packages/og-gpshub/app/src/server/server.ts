@@ -3,7 +3,7 @@ import { FiveMServerNetworkDriver } from "og-core/src/driver/fivemServerNetworkD
 import { ServerEventUseCase } from "og-core/src/usecase/EventUseCase";
 import { CreateSessionUseCase } from "src/lib/usecase/createSessionUseCase";
 import { JoinSessionUseCase } from "src/lib/usecase/joinSessionUseCase";
-import { Channel } from "src/lib/domain/channel";
+import { Channel, ChannelId, isValidChannel } from "src/lib/domain/channel";
 import { PlayerId } from "src/lib/domain/player";
 import { LeaveSessionUseCase } from "src/lib/usecase/leaveSessionUseCase";
 import { Events } from "src/constants/events";
@@ -15,23 +15,22 @@ import { FindCitizenUseCase } from "../lib/usecase/findCitizenNameUseCase";
 import { PlayerLocation } from "@/src/lib/domain/location";
 import { serversQBCore } from "@/src/lib/driver/qbCore";
 import { UpdatePlayerLocationUseCase } from "../lib/usecase/updatePlayerLocationUseCase";
-import { LocationPort } from "../lib/port/locationPort";
+import { InMemoryPlayerLocationGateway } from "../lib/gateway/inMemoryPlayerLocationGateway";
+import { InMemoryPlayerLocationDriver } from "../lib/driver/inMemoryPlayerLocation";
+import { StatusEventHandler } from "./status";
+import { FindPlayerLocationUseCase } from "../lib/usecase/findPlayerLocationUseCase";
+import { Broadcast } from "./broadcast";
 
 // drivers
 const fivemNetworkDriver = new FiveMServerNetworkDriver();
 const inMemorySessionDriver = new InMemorySessionDriver();
 const qbCitizenDriver = new ServerQBDriver(serversQBCore);
+const inMemoryPlayerLocationDriver = new InMemoryPlayerLocationDriver();
 
 // gateways
 const sessionGateway = new InMemorySessionGateway(inMemorySessionDriver);
 const citizenGateway = new QbCitizenGateway(qbCitizenDriver);
-
-// TODO
-const locationGateway = {
-  savePlayerLocation(citizenId, location) {
-    throw new Error("Method not implemented.");
-  },
-} as LocationPort;
+const locationGateway = new InMemoryPlayerLocationGateway(inMemoryPlayerLocationDriver);
 
 // usecases
 const eventUseCase = new ServerEventUseCase("og-gpshub", fivemNetworkDriver);
@@ -41,6 +40,7 @@ const leaveSessionUseCase = new LeaveSessionUseCase(sessionGateway);
 const findSessionUseCase = new FindSessionUseCase(sessionGateway);
 const findCitizenUseCase = new FindCitizenUseCase(citizenGateway);
 const updateLocationUseCase = new UpdatePlayerLocationUseCase(locationGateway, sessionGateway);
+const findPlayerLocationUseCase = new FindPlayerLocationUseCase(locationGateway);
 
 // eventUseCase.on("playerLocationUpdate", ({ playerId, location }: PlayerLocationData) => {
 //   if (!playerId || !location) {
@@ -62,12 +62,18 @@ eventUseCase.on(Events.create, async (channelId: string) => {
     id: channelId,
   } as Channel;
 
+  if (!isValidChannel(channel)) {
+    console.error("Invalid channel name:");
+    return;
+  }
+
   const result = await createSessionUseCase.execute(channel, source as PlayerId);
 
-  console.log("create session: ", result.success);
   if (!result.success) {
     console.error(result.error);
   }
+
+  console.log("create session:", result.success);
 });
 
 eventUseCase.on(Events.join, async (channelid: string) => {
@@ -100,24 +106,18 @@ eventUseCase.on(Events.leave, async (channelid: string) => {
   }
 });
 
-eventUseCase.on(Events.recordLocation, (location: PlayerLocation) => {
-  // where
-  console.info("LOCATION: ", location);
-  // who
+eventUseCase.on(Events.recordLocation, async (location: PlayerLocation) => {
   const citizen = findCitizenUseCase.findCitizen();
-  // session or channel
 
-  updateLocationUseCase.execute(citizen.id, location);
-});
+  const result = await updateLocationUseCase.execute(source as PlayerId, citizen.id, location);
 
-eventUseCase.on(Events.status, async () => {
-  const results = await findSessionUseCase.findAll();
-
-  if (results.length === 0) {
-    console.info("No session found");
+  if (!result.success) {
+    console.error(result.error);
+    return;
   }
 
-  results.forEach((session, idx) => {
-    console.info(`session ${idx}: `, session);
-  });
+  eventUseCase.emit(Events.broadcast, result.value);
 });
+
+new StatusEventHandler(eventUseCase, findSessionUseCase, findPlayerLocationUseCase);
+new Broadcast(eventUseCase, findSessionUseCase);

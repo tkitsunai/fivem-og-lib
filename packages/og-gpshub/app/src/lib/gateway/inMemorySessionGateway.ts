@@ -1,4 +1,4 @@
-import { ChannelId } from "../domain/channel";
+import { Channel, ChannelId } from "../domain/channel";
 import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { InMemorySessionDriver, SessionEntity } from "../driver/inMemorySessionDriver";
@@ -6,6 +6,17 @@ import { SessionPort } from "../port/sessionPort";
 
 export class InMemorySessionGateway implements SessionPort {
   constructor(private inMemorySessionDriver: InMemorySessionDriver) {}
+
+  async findByPlayerId(playerId: PlayerId): Promise<Session | null> {
+    const sessions = await this.inMemorySessionDriver.findAll();
+    const joinedSession = sessions.find((session) => session.players.includes(playerId));
+    return joinedSession
+      ? new Session({
+          channel: { id: joinedSession.channelId as ChannelId } as Channel,
+          players: [...joinedSession.players.map((playerId) => playerId as PlayerId)],
+        })
+      : null;
+  }
 
   async deleteByChannelId(channelId: ChannelId): Promise<void> {
     return this.inMemorySessionDriver.deleteByChannelId(channelId.toString());

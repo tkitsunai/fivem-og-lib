@@ -8,4 +8,5 @@ export interface ClientNetworkPort {
 export interface ServerNetworkPort {
   on(eventName: string, handler: (...args: any[]) => void): void;
   emit(eventName: string, targetId: number, ...args: any[]): void;
+  emitLocal(eventName: string, ...args: any[]): void;
 }

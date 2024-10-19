@@ -60,4 +60,15 @@ describe("Session Domain Test", () => {
   ])(`$description`, ({ target, addPlayer, expected }) => {
     expect(() => target.join(addPlayer)).toThrow(expected);
   });
+
+  it("find all players", () => {
+    const info = {
+      channel,
+      players: [playerA, playerB],
+    };
+
+    const expected = [playerA, playerB];
+
+    expect(new Session(info).findAllPlayers()).toEqual(expected);
+  });
 });

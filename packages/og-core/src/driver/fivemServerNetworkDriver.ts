@@ -8,4 +8,8 @@ export class FiveMServerNetworkDriver implements ServerNetworkPort {
   emit(eventName: string, targetId: number, ...args: any[]): void {
     emitNet(eventName, targetId, ...args);
   }
+
+  emitLocal(eventName: string, ...args: any[]): void {
+    emit(eventName, ...args);
+  }
 }

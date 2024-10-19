@@ -1,35 +1,35 @@
 export const RegisterCommands = {
-  ogAdmin: "ogAdmin",
+  ogadmin: "ogadmin",
 } as const;
 
 export const SuggestionCommands = {
   help: {
-    command: "/ogAdmin help",
-    description: "ogAdminのAdmin Helpコマンド",
+    command: "/ogadmin help",
+    description: "ogadminのAdmin Helpコマンド",
     args: undefined,
   },
   create: {
-    command: "/ogAdmin create",
+    command: "/ogadmin create",
     description: "create channel session",
     args: [{ name: "channelName", help: "チャネル名を指定します" }],
   },
   join: {
-    command: "/ogAdmin join",
+    command: "/ogadmin join",
     description: "join channel session",
     args: [{ name: "channelName", help: "チャネル名を指定します" }],
   },
   leave: {
-    command: "/ogAdmin leave",
+    command: "/ogadmin leave",
     description: "leave from channel session",
     args: [{ name: "channelName", help: "チャネル名を指定します" }],
   },
   locate: {
-    command: "/ogAdmin locate",
+    command: "/ogadmin locate",
     description: "locate player",
     args: undefined,
   },
   status: {
-    command: "/ogAdmin status",
+    command: "/ogadmin status",
     description: "confirming server's all session",
     args: undefined,
   },

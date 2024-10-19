@@ -100,7 +100,7 @@ function emitCommand(source: number, args: string[], rawCommand: string) {
   eventUseCase.emitToServer(commandName, args.slice(1));
 }
 
-RegisterCommand(RegisterCommands.ogAdmin, emitCommand, false);
+RegisterCommand(RegisterCommands.ogadmin, emitCommand, false);
 
 on("og_gpshub:help", () => {
   const keys = Object.keys(ClientEventMap) as ClientEventKey[];
