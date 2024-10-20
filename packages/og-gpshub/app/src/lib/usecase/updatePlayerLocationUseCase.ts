@@ -26,7 +26,7 @@ export class UpdatePlayerLocationUseCase {
       };
     }
 
-    await this.locationPort.savePlayerLocation(citizenId, location);
+    await this.locationPort.savePlayerLocation2(playerId, location);
     return {
       success: true,
       value: channel.sessionInfo.channel,

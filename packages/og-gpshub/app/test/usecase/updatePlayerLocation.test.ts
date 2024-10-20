@@ -17,6 +17,7 @@ describe("updatePlayerLocation", () => {
 
     const locationPortMock: Partial<LocationPort> = {
       savePlayerLocation: vi.fn(),
+      savePlayerLocation2: vi.fn(),
     };
 
     const sessionPortMock: Partial<SessionPort> = {
@@ -34,7 +35,7 @@ describe("updatePlayerLocation", () => {
 
     const actual = await target.execute(playerId, citizenId, playerLocation);
 
-    expect(locationPortMock.savePlayerLocation).toHaveBeenCalledWith(citizenId, playerLocation);
+    expect(locationPortMock.savePlayerLocation2).toHaveBeenCalledWith(playerId, playerLocation);
     expect(sessionPortMock.findByPlayerId).toHaveBeenCalled();
     expect(actual.success).toBeTruthy();
     actual.success && expect(actual.value).toEqual({ id: "channel1" } as Channel);
@@ -43,6 +44,7 @@ describe("updatePlayerLocation", () => {
   it("player has not joined to session yet, returning PlayerHasNotJoinedError", async () => {
     const locationPortMock: Partial<LocationPort> = {
       savePlayerLocation: vi.fn(),
+      savePlayerLocation2: vi.fn(),
     };
 
     const sessionPortMock: Partial<SessionPort> = {
@@ -61,7 +63,7 @@ describe("updatePlayerLocation", () => {
     const actual = await target.execute(playerId, citizenId, playerLocation);
 
     expect(sessionPortMock.findByPlayerId).toHaveBeenCalled();
-    expect(locationPortMock.savePlayerLocation).not.toHaveBeenCalledWith(citizenId, playerLocation);
+    expect(locationPortMock.savePlayerLocation2).not.toHaveBeenCalledWith(playerId, playerLocation);
     expect(actual.success).toBeFalsy();
     !actual.success && expect(actual.error).toEqual(new PlayerHasNotJoinedError());
   });

@@ -13,5 +13,8 @@
   },
   "dependencies": {
     "og-core": "workspace:*"
+  },
+  "devDependencies": {
+    "vite-plugin-checker": "^0.8.0"
   }
 }

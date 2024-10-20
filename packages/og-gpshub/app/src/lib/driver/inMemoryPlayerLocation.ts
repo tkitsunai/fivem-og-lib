@@ -18,4 +18,21 @@ export class InMemoryPlayerLocationDriver {
   async findAll(): Promise<PlayerLocation[]> {
     return Array.from(this.locations.values());
   }
+
+  async getPlayerLocations(playerId: string[]): Promise<Map<string, PlayerLocation>> {
+    return playerId
+      .map((id) => {
+        const location = this.locations.get(id);
+        if (location) {
+          return { id, location } as const;
+        }
+      })
+      .filter((item) => item !== undefined)
+      .reduce<Map<string, PlayerLocation>>((map, { id, location }) => {
+        if (location) {
+          map.set(id, location);
+        }
+        return map;
+      }, new Map<string, PlayerLocation>());
+  }
 }

@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import path from "path";
+import Checker from "vite-plugin-checker";
 
 export default defineConfig({
+  plugins: [Checker({ typescript: true })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname),

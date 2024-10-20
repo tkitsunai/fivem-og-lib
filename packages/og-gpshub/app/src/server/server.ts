@@ -40,7 +40,7 @@ const leaveSessionUseCase = new LeaveSessionUseCase(sessionGateway);
 const findSessionUseCase = new FindSessionUseCase(sessionGateway);
 const findCitizenUseCase = new FindCitizenUseCase(citizenGateway);
 const updateLocationUseCase = new UpdatePlayerLocationUseCase(locationGateway, sessionGateway);
-const findPlayerLocationUseCase = new FindPlayerLocationUseCase(locationGateway);
+const findPlayerLocationUseCase = new FindPlayerLocationUseCase(locationGateway, sessionGateway);
 
 // eventUseCase.on("playerLocationUpdate", ({ playerId, location }: PlayerLocationData) => {
 //   if (!playerId || !location) {
@@ -120,4 +120,4 @@ eventUseCase.on(Events.recordLocation, async (location: PlayerLocation) => {
 });
 
 new StatusEventHandler(eventUseCase, findSessionUseCase, findPlayerLocationUseCase);
-new Broadcast(eventUseCase, findSessionUseCase);
+new Broadcast(eventUseCase, findSessionUseCase, findPlayerLocationUseCase);

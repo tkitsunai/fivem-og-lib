@@ -4,6 +4,12 @@ import { Session, SessionId } from "../domain/session";
 import { SessionPort } from "../port/sessionPort";
 
 export class QBDBSessionGateway implements SessionPort {
+  deleteByChannelId(channelId: ChannelId): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  findAll(): Promise<Session[]> {
+    throw new Error("Method not implemented.");
+  }
   save(session: Session): Promise<Session> {
     throw new Error("Method not implemented.");
   }
