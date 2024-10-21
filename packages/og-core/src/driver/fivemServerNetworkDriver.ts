@@ -1,6 +1,6 @@
-import { ServerNetworkPort } from "../port/networkPort";
+import { LocalEmitter, ServerNetworkPort } from "../port/networkPort";
 
-export class FiveMServerNetworkDriver implements ServerNetworkPort {
+export class FiveMServerNetworkDriver implements ServerNetworkPort, LocalEmitter {
   on(eventName: string, handler: (...args: any[]) => void): void {
     onNet(eventName, handler);
   }

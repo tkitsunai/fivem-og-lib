@@ -3,22 +3,21 @@ import { PlayerLocation } from "../lib/domain/location";
 import { ClientEventUseCase } from "og-core/src/usecase/EventUseCase";
 import { Events } from "@/src/constants/events";
 import { RegisterCommands, SuggestionCommands } from "../constants/commands";
-import { PlayerId as PlayerIdDomain } from "@/src/lib/domain/player";
+import { BlipGateway } from "../lib/gateway/blipGateway";
+import { DrawBlipUseCase } from "../lib/usecase/drawBlipUseCase";
+import { FindBlipUseCase } from "../lib/usecase/findBlipUseCase";
+import { PlayerId } from "../lib/domain/player";
 
 // drivers
 const fivemNetworkDriver = new FiveMClientNetworkDriver();
 
+// gateways
+const blipGateway = new BlipGateway();
+
 // usecases
 const eventUseCase = new ClientEventUseCase("og-gpshub", fivemNetworkDriver);
-
-function sendPlayerLocation() {
-  const playerId = GetPlayerServerId(PlayerId());
-  const coords = GetEntityCoords(PlayerPedId(), true) as [number, number, number];
-  eventUseCase.emitToServer("playerLocationUpdate", {
-    playerId: playerId.toString(),
-    location: toLocationDomain(coords),
-  });
-}
+const drawBlipUseCase = new DrawBlipUseCase(blipGateway);
+const findBlipUseCase = new FindBlipUseCase(blipGateway);
 
 function toLocationDomain(number: number[]): PlayerLocation {
   return {
@@ -32,12 +31,36 @@ setInterval(() => {
   //  sendPlayerLocation();
 }, 3000);
 
-type BlipNumber = number;
-type ServerPlayerId = number;
+// memo: クライアント側で保持する位置情報（チャネルメンバー全員の位置情報
 
-const playerBlips: Map<ServerPlayerId, BlipNumber> = new Map();
+type PlayerInfo = {
+  id: number;
+  name: string;
+};
 
-const localPlayerLocation: Map<PlayerIdDomain, Location> = new Map();
+type PlayerLocationInfo = {
+  player: PlayerInfo;
+  location: PlayerLocation;
+};
+
+eventUseCase.on(Events.updateLocations, (playerLocationInfos: PlayerLocationInfo[]) => {
+  console.log("channel's members location update");
+  updateBlip(playerLocationInfos);
+});
+
+const localPlayerLocationInfos: PlayerLocationInfo[] = [];
+
+function updateBlip(playerLocationInfos: PlayerLocationInfo[]) {
+  console.log("updateBlip");
+  console.log("PlayerLocationInfos", playerLocationInfos);
+  // 各プレイヤーのブリップ取得して位置情報を再描画
+  // TODO: async対応
+  playerLocationInfos.forEach(async (playerLocationInfo) => {
+    const { player, location } = playerLocationInfo;
+    const blip = await findBlipUseCase.execute(player.id as PlayerId);
+    drawBlipUseCase.execute(blip, location, player);
+  });
+}
 
 // eventUseCase.on(
 //   "broadcastPlayerLocation",

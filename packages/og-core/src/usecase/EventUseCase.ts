@@ -1,9 +1,9 @@
-import { ClientNetworkPort, ServerNetworkPort } from "../port/networkPort";
+import { ClientNetworkPort, LocalEmitter, ServerNetworkPort } from "../port/networkPort";
 
 export class ClientEventUseCase {
   constructor(
     private readonly eventPrefix: string,
-    private readonly networkPort: ClientNetworkPort
+    private readonly networkPort: ClientNetworkPort & LocalEmitter
   ) {}
 
   on(event: string, handler: (...args: any[]) => void): void {
@@ -16,6 +16,11 @@ export class ClientEventUseCase {
     this.networkPort.emit(eventName, ...args);
   }
 
+  emit(event: string, ...args: any[]): void {
+    const eventName = this.fullEventName(event);
+    this.networkPort.emitLocal(eventName, ...args);
+  }
+
   private fullEventName(event: string): string {
     return [this.eventPrefix, event].join(":");
   }
@@ -24,7 +29,7 @@ export class ClientEventUseCase {
 export class ServerEventUseCase {
   constructor(
     private readonly eventPrefix: string,
-    private readonly networkPort: ServerNetworkPort
+    private readonly networkPort: ServerNetworkPort & LocalEmitter
   ) {}
 
   on(event: string, handler: (...args: any[]) => void): void {

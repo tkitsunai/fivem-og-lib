@@ -3,6 +3,7 @@ import { FindSessionUseCase } from "../lib/usecase/findSessionUseCase";
 import { Channel } from "../lib/domain/channel";
 import { Events } from "../constants/events";
 import { FindPlayerLocationUseCase } from "../lib/usecase/findPlayerLocationUseCase";
+import { PlayerInfo } from "../lib/domain/player";
 
 export class Broadcast {
   constructor(
@@ -26,7 +27,6 @@ export class Broadcast {
       console.log("channel:", channel);
       console.log("found session:", foundSessionResult);
 
-      //TODO: implement broadcast usecase, emit event to all members of the channel
       const playerLocationsResult = await this.findPlayerLocationUseCase.findByChannelId(
         channel.id
       );
@@ -36,7 +36,19 @@ export class Broadcast {
         return;
       }
 
-      console.log("player locations:", playerLocationsResult.value);
+      playerLocationsResult.value.forEach((playerLocation) => {
+        const { playerId } = playerLocation;
+        console.log("emit to player:", playerId, "DATA:", playerLocationsResult.value);
+        this.eventUseCase.emitToClient(
+          Events.updateLocations,
+          playerId,
+          // TODO get player info from player id
+          playerLocationsResult.value.map((playerLocation) => ({
+            player: { name: "Yamada-Taro" } as PlayerInfo,
+            location: playerLocation.location,
+          }))
+        );
+      });
     });
   }
 }

@@ -5,6 +5,7 @@ export const Events = {
   status: "status",
   recordLocation: "recordLocation",
   broadcast: "broadcast",
+  updateLocations: "updateLocations",
 } as const;
 
 export type ServerEvents = typeof Events;
