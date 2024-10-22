@@ -4,8 +4,8 @@ import { PlayerDatas } from "server-qbcore";
 export class ServerQBDriver {
   constructor(private readonly qbCore: ServerQBCore) {}
 
-  getPlayerData(): PlayerDatas {
-    const citizenData = this.qbCore.Functions.GetPlayer(source);
+  getPlayerData(serverPlayerId: number): PlayerDatas {
+    const citizenData = this.qbCore.Functions.GetPlayer(serverPlayerId);
     return citizenData;
   }
 }

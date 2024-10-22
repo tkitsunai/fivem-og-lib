@@ -37,4 +37,8 @@ export class Session {
   findAllPlayers(): PlayerId[] {
     return this.sessionInfo.players;
   }
+
+  getChannel(): Channel {
+    return this.sessionInfo.channel;
+  }
 }

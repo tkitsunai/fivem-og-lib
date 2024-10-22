@@ -1,13 +1,11 @@
 import { ServerEventUseCase } from "og-core/src/usecase/EventUseCase";
 import { FindSessionUseCase } from "@/src/lib/usecase/findSessionUseCase";
 import { Events } from "../constants/events";
-import { FindPlayerLocationUseCase } from "../lib/usecase/findPlayerLocationUseCase";
 
-export class StatusEventHandler {
+export class Status {
   constructor(
     private readonly eventUseCase: ServerEventUseCase,
-    private readonly findSessionUseCase: FindSessionUseCase,
-    private readonly findLocationUseCase: FindPlayerLocationUseCase
+    private readonly findSessionUseCase: FindSessionUseCase
   ) {
     this.onStatus();
   }
@@ -15,9 +13,7 @@ export class StatusEventHandler {
   onStatus() {
     this.eventUseCase.on(Events.status, async () => {
       const sessions = await this.findSessionUseCase.findAll();
-      const locations = await this.findLocationUseCase.findAll();
       this.logging(sessions, "SESSION");
-      this.logging(locations, "LOCATION");
     });
   }
 

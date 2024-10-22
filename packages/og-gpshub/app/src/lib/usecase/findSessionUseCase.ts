@@ -1,7 +1,8 @@
 import { ChannelId } from "../domain/channel";
+import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { SessionPort } from "../port/sessionPort";
-import { SessionNotFoundError } from "./errors";
+import { PlayerHasNotJoinedError, SessionNotFoundError } from "./errors";
 import { Result } from "./result";
 
 export class FindSessionUseCase {
@@ -10,6 +11,21 @@ export class FindSessionUseCase {
   async findAll(): Promise<Session[]> {
     const results = await this.sessionPort.findAll();
     return results;
+  }
+
+  async findByPlayerId(playerId: PlayerId): Promise<Result<Session, PlayerHasNotJoinedError>> {
+    const found = await this.sessionPort.findByPlayerId(playerId);
+    if (!found) {
+      return {
+        success: false,
+        error: new PlayerHasNotJoinedError(),
+      };
+    }
+
+    return {
+      success: true,
+      value: found,
+    };
   }
 
   async findByChannelId(channelId: ChannelId): Promise<Result<Session, SessionNotFoundError>> {

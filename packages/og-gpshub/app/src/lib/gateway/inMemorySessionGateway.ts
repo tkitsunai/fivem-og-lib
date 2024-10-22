@@ -1,5 +1,5 @@
 import { Channel, ChannelId } from "../domain/channel";
-import { PlayerId } from "../domain/player";
+import { PlayerId, PlayerServerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { InMemorySessionDriver, SessionEntity } from "../driver/inMemorySessionDriver";
 import { SessionPort } from "../port/sessionPort";
@@ -9,7 +9,9 @@ export class InMemorySessionGateway implements SessionPort {
 
   async findByPlayerId(playerId: PlayerId): Promise<Session | null> {
     const sessions = await this.inMemorySessionDriver.findAll();
-    const joinedSession = sessions.find((session) => session.players.includes(playerId));
+    const joinedSession = sessions.find((session) =>
+      session.players.includes(playerId as PlayerServerId)
+    );
     return joinedSession
       ? new Session({
           channel: { id: joinedSession.channelId as ChannelId } as Channel,

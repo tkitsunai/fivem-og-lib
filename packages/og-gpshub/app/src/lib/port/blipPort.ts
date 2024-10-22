@@ -1,8 +1,7 @@
-import { BlipNumber } from "../domain/blip";
-import { PlayerLocation } from "../domain/location";
-import { PlayerId, PlayerInfo } from "../domain/player";
+import { Blip, BlipNumber } from "../domain/blip";
+import { PlayerInfo } from "../domain/player";
 
 export interface BlipPort {
-  findBlipByPlayerId(playerId: PlayerId): Promise<BlipNumber>;
-  drawBlip(blip: BlipNumber, PlayerLocation: PlayerLocation, player: PlayerInfo): Promise<void>;
+  createBlipForPlayer(playerInfo: PlayerInfo): Blip;
+  removeBlip(blip: BlipNumber): void;
 }

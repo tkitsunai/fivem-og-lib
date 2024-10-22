@@ -6,6 +6,7 @@ export class FiveMServerNetworkDriver implements ServerNetworkPort, LocalEmitter
   }
 
   emit(eventName: string, targetId: number, ...args: any[]): void {
+    console.info("emitNet:", eventName, targetId, args);
     emitNet(eventName, targetId, ...args);
   }
 

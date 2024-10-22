@@ -4,8 +4,8 @@ export const Events = {
   leave: "playerLeaveSession",
   status: "status",
   recordLocation: "recordLocation",
-  broadcast: "broadcast",
-  updateLocations: "updateLocations",
+  broadcastToChannel: "broadcastToChannel",
+  receivePlayerLocation: "receivePlayerLocation",
 } as const;
 
 export type ServerEvents = typeof Events;
