@@ -1,11 +1,11 @@
-import { PlayerId, PlayerInfo } from "../domain/player";
+import { PlayerId, Player } from "../domain/player";
 import { PlayerPort } from "../port/playerPort";
 
 export class FindPlayerUseCase {
   constructor(private readonly playerPort: PlayerPort) {}
 
-  findPlayer(playerId: PlayerId): PlayerInfo | null {
-    const player = this.playerPort.getPlayer(playerId);
+  findPlayer(id: PlayerId): Player | null {
+    const player = this.playerPort.getPlayer(id);
 
     if (!player) {
       return null;

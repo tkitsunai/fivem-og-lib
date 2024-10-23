@@ -1,4 +1,6 @@
-export type ChannelId = string & { __brand: "ChannelId" };
+// export type ChannelId = string & { __brand: "ChannelId" };
+
+export type ChannelId = string;
 
 export interface Channel {
   id: ChannelId;

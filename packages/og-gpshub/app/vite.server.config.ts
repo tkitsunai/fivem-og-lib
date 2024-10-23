@@ -1,17 +1,9 @@
-import { defineConfig } from "vite";
+import { mergeConfig } from "vite";
 import path from "path";
-import Checker from "vite-plugin-checker";
+import { commonConfig } from "./vite.config";
 
-export default defineConfig({
-  plugins: [Checker({ typescript: true })],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname),
-      src: path.resolve(__dirname, "./src"),
-    },
-  },
+export default mergeConfig(commonConfig, {
   build: {
-    minify: false,
     rollupOptions: {
       input: {
         server: path.resolve(__dirname, "src/server/server.ts"),
@@ -23,8 +15,5 @@ export default defineConfig({
         format: "es",
       },
     },
-    target: "es2020",
-    outDir: "../dist/app",
-    emptyOutDir: false,
   },
 });

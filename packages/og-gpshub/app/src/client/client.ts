@@ -5,16 +5,16 @@ import { RegisterCommands } from "../constants/commands";
 import { BlipGateway } from "../lib/gateway/blipGateway";
 import { Locate } from "./locaters";
 import { FindPlayerUseCase } from "../lib/usecase/findPlayerUseCase";
-import { FiveMPlayerGateway } from "../lib/gateway/fivemPlayerGateway";
 import { BlipUseCase } from "../lib/usecase/blipUseCase";
 import { Suggest } from "./suggest";
+import { GatewayFactory } from "../lib/factories/gatewayFactory";
 
 // drivers
 const fivemNetworkDriver = new FiveMClientNetworkDriver();
 
 // gateways
 const blipGateway = new BlipGateway();
-const playerGateway = new FiveMPlayerGateway();
+const playerGateway = GatewayFactory.createClientPlayerGateway();
 
 // usecases
 const eventUseCase = new ClientEventUseCase("og-gpshub", fivemNetworkDriver);
@@ -22,7 +22,7 @@ const blipUseCase = new BlipUseCase(blipGateway);
 const findPlayerUseCase = new FindPlayerUseCase(playerGateway);
 
 // Application Services
-new Locate(eventUseCase, findPlayerUseCase, blipUseCase);
+new Locate(eventUseCase, blipUseCase);
 new Suggest();
 
 const ClientEventMap = {

@@ -1,7 +1,7 @@
 import { Blip, BlipNumber } from "../domain/blip";
-import { PlayerInfo } from "../domain/player";
+import { Player } from "../domain/player";
 
 export interface BlipPort {
-  createBlipForPlayer(playerInfo: PlayerInfo): Blip;
+  createBlipForPlayer(playerInfo: Player): Blip;
   removeBlip(blip: BlipNumber): void;
 }

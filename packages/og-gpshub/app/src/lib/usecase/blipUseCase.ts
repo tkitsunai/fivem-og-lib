@@ -1,11 +1,11 @@
 import { Blip, BlipNumber } from "../domain/blip";
-import { PlayerInfo } from "../domain/player";
+import { Player } from "../domain/player";
 import { BlipPort } from "../port/blipPort";
 
 export class BlipUseCase {
   constructor(private blipPort: BlipPort) {}
 
-  createBlipForPlayer(players: PlayerInfo[]): Blip[] {
+  createBlipForPlayer(players: Player[]): Blip[] {
     return players.map((player) => {
       return this.blipPort.createBlipForPlayer(player);
     });

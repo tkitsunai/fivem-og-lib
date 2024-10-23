@@ -14,6 +14,7 @@ export class FindSessionUseCase {
   }
 
   async findByPlayerId(playerId: PlayerId): Promise<Result<Session, PlayerHasNotJoinedError>> {
+    // TODO: plz debug this
     const found = await this.sessionPort.findByPlayerId(playerId);
     if (!found) {
       return {

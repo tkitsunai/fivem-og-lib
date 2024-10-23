@@ -1,13 +1,21 @@
+import ClientQBCore from "client-qbcore";
 import ServerQBCore from "server-qbcore";
-import { PlayerDatas } from "server-qbcore";
+import { PlayerDatas as ServerPlayerDatas } from "server-qbcore";
+import { PlayerDatas as ClientPlayerDatas } from "client-qbcore";
 
 export class ServerQBDriver {
   constructor(private readonly qbCore: ServerQBCore) {}
 
-  getPlayerData(serverPlayerId: number): PlayerDatas {
+  getPlayerData(serverPlayerId: number): ServerPlayerDatas {
     const citizenData = this.qbCore.Functions.GetPlayer(serverPlayerId);
     return citizenData;
   }
 }
 
-export class ClientQBDriver {}
+export class ClientQBDriver {
+  constructor(private readonly qbCore: ClientQBCore) {}
+
+  getPlayerData(): ClientPlayerDatas {
+    throw new Error("Method not implemented.");
+  }
+}
