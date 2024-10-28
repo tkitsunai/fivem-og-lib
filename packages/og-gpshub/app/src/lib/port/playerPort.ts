@@ -1,4 +1,4 @@
-import { PlayerId, Player, PlayerPed } from "../domain/player";
+import { PlayerId, Player } from "../domain/player";
 
 export interface PlayerPort {
   getPlayer(playerId: PlayerId): Player | null;

@@ -12,7 +12,7 @@ export class GatewayFactory {
     const framework = __APP_CONFIG__.app.framework;
     switch (framework) {
       case "qb-framework":
-        throw new Error("qb-framework not supported: client player gateway factory");
+        return new QbCitizenGateway(new ServerQBDriver(serversQBCore));
       case "native":
         return new NativeClientPlayerGateway();
       default:

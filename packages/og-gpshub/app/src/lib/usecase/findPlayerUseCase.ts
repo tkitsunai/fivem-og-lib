@@ -1,4 +1,4 @@
-import { PlayerId, Player } from "../domain/player";
+import { PlayerId, Player, PlayerServerId } from "../domain/player";
 import { PlayerPort } from "../port/playerPort";
 
 export class FindPlayerUseCase {

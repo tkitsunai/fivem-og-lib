@@ -1,5 +1,5 @@
 import { Channel, ChannelId } from "../domain/channel";
-import { PlayerId, PlayerServerId } from "../domain/player";
+import { PlayerId } from "../domain/player";
 import { Session } from "../domain/session";
 import { InMemorySessionDriver, SessionEntity } from "../driver/inMemorySessionDriver";
 import { SessionPort } from "../port/sessionPort";
@@ -10,7 +10,7 @@ export class InMemorySessionGateway implements SessionPort {
   async findByPlayerId(playerId: PlayerId): Promise<Session | null> {
     const sessions = await this.inMemorySessionDriver.findAll();
     const joinedSession = sessions.find((session) =>
-      session.players.includes(playerId as PlayerServerId)
+      session.players.find((p) => p === playerId.toString())
     );
     return joinedSession
       ? new Session({
@@ -27,7 +27,7 @@ export class InMemorySessionGateway implements SessionPort {
   async save(session: Session): Promise<Session> {
     const entity = {
       channelId: session.sessionInfo.channel.id.toString(),
-      players: session.sessionInfo.players,
+      players: session.sessionInfo.players.map((playerId) => playerId.toString()),
     } as SessionEntity;
 
     try {
@@ -45,7 +45,7 @@ export class InMemorySessionGateway implements SessionPort {
     return entity
       ? new Session({
           channel: { id: entity.channelId as ChannelId },
-          players: [...entity.players].map((playerId) => playerId as PlayerId),
+          players: [...entity.players].map((playerId) => playerId.toString() as PlayerId),
         })
       : null;
   }
@@ -55,7 +55,7 @@ export class InMemorySessionGateway implements SessionPort {
     return entities.map((entity) => {
       return new Session({
         channel: { id: entity.channelId as ChannelId },
-        players: [...entity.players].map((playerId) => playerId as PlayerId),
+        players: [...entity.players].map((playerId) => playerId.toString() as PlayerId),
       });
     });
   }

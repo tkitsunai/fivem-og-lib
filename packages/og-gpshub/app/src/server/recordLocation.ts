@@ -15,7 +15,15 @@ export class RecordLocation {
 
   onRecordLocation() {
     this.serverEvent.on(Events.recordLocation, async () => {
-      const result = await this.findSessionUseCase.findByPlayerId(source as PlayerId);
+      const playerServerId = source;
+      const player = this.findPlayerUseCase.findPlayer(playerServerId as PlayerId);
+
+      if (!player) {
+        console.error("player not found.");
+        return;
+      }
+
+      const result = await this.findSessionUseCase.findByPlayerId(player.id);
 
       if (!result.success) {
         console.error("failed to find session.", result.error);
@@ -30,7 +38,16 @@ export class RecordLocation {
         })
         .filter((player) => player !== null);
 
-      this.serverEvent.emitToClient(Events.receivePlayerLocation, -1, { players });
+      const emitValue = {
+        players: players.map((player) => {
+          return {
+            id: player.id,
+            name: player.name.getFullName(),
+          };
+        }),
+      };
+
+      this.serverEvent.emitToClient(Events.receivePlayerLocation, playerServerId, emitValue);
     });
   }
 }

@@ -4,7 +4,6 @@ export const Events = {
   leave: "playerLeaveSession",
   status: "status",
   recordLocation: "recordLocation",
-  // broadcastToChannel: "broadcastToChannel",
   receivePlayerLocation: "receivePlayerLocation",
 } as const;
 

@@ -27,6 +27,7 @@ declare module "server-qbcore" {
   interface ServerQBCore {
     Functions: {
       GetPlayer(source: number): PlayerDatas;
+      GetPlayerByCitizenId(citizenId: string): PlayerDatas;
     };
   }
 

@@ -3,6 +3,10 @@ export type CitizenId = string & { __brand: "CitizenId" };
 export type Name = string;
 export type PlayerId = PlayerServerId | CitizenId;
 
+export function isCitizenId(playerId: PlayerId): playerId is CitizenId {
+  return isNaN(Number(playerId)) && playerId.toString().trim() !== "";
+}
+
 export class PlayerName {
   constructor(
     private readonly firstName?: Name,
@@ -16,6 +20,14 @@ export class PlayerName {
 
   static fromSingleName(singleName: Name): PlayerName {
     return new PlayerName(undefined, undefined, singleName);
+  }
+
+  static fromSplitName(name: Name): PlayerName {
+    if (name.includes(" ")) {
+      const [firstName, lastName] = name.split(" ");
+      return PlayerName.fromFullName(firstName, lastName);
+    }
+    return PlayerName.fromSingleName(name);
   }
 
   getFullName(): Name {

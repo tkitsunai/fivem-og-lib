@@ -10,6 +10,11 @@ export class ServerQBDriver {
     const citizenData = this.qbCore.Functions.GetPlayer(serverPlayerId);
     return citizenData;
   }
+
+  getPlayerDataByCitizen(citizenId: string): ServerPlayerDatas {
+    const citizenData = this.qbCore.Functions.GetPlayerByCitizenId(citizenId);
+    return citizenData;
+  }
 }
 
 export class ClientQBDriver {

@@ -1,7 +1,12 @@
 import { ClientEventUseCase } from "og-core/src/usecase/EventUseCase";
 import { Events } from "../constants/events";
-import { Player } from "../lib/domain/player";
+import { PlayerId, PlayerName } from "../lib/domain/player";
 import { BlipUseCase } from "../lib/usecase/blipUseCase";
+
+type PlayerStructure = {
+  id: string;
+  name: string;
+};
 
 export class Locate {
   constructor(
@@ -12,8 +17,15 @@ export class Locate {
   }
 
   onReceivePlayerLocation() {
-    this.clientEvent.on(Events.receivePlayerLocation, ({ players }: { players: Player[] }) => {
-      this.blipUseCase.createBlipForPlayer(players);
-    });
+    this.clientEvent.on(
+      Events.receivePlayerLocation,
+      ({ players }: { players: PlayerStructure[] }) => {
+        const playersDomain = players.map((player) => ({
+          id: player.id as PlayerId,
+          name: PlayerName.fromSplitName(player.name),
+        }));
+        this.blipUseCase.createBlipForPlayer(playersDomain);
+      }
+    );
   }
 }

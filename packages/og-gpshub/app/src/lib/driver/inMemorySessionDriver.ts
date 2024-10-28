@@ -1,4 +1,4 @@
-type PlayerId = number;
+type PlayerId = string;
 
 export type SessionEntity = {
   channelId: string;
